@@ -15,7 +15,7 @@ class Source(object):
 
   def get_words(self, filters=None):
     """
-    Gets all the words within the document
+    Gets all the words within the source
 
     :param filters: Collection of word filters which tell
                     which words can make it into
@@ -40,20 +40,6 @@ class Source(object):
     self.no_words = len(word_list)
 
     return word_list
-
-  def get_total_words(self, filters=None):
-    """
-    Get all the words in this source
-
-    :param filters: Collection of word filters which tell
-                    which words can make it into
-                    the list and which cannot
-    :type filters: list[WordFilter]
-    :return:
-    """
-    if self.no_words is None:
-      return len(self.get_words(filters=filters))
-    return self.no_words
 
   def get_name(self):
     """Get name of the source"""
