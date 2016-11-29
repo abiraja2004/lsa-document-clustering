@@ -1,111 +1,11 @@
-import scipy
-import scipy.cluster
 import os.path
 import filters
 from matrices import *
-from math import log
+from algorithms import *
+from normalizers import *
 import matplotlib.cm
 import matplotlib.colors
 import matplotlib.pyplot as plt
-
-
-class Normalizer(object):
-  """
-  Default normalizer (no normalisation)
-  """
-
-  @staticmethod
-  def normalize(matrix):
-    return matrix
-
-
-class TFIDF(Normalizer):
-  @staticmethod
-  def normalize(matrix):
-    """
-    Normalizes the frequency counts as per the TF-IDF scheme (Salton and McGill, 1986)
-
-    :param matrix: The source/term frequency matrix
-    :type  matrix: numpy.matrix
-    :return: The normalized source/term frequency matrix
-    """
-    # create a copy of it
-    tfidf_matrix = matrix.copy()
-    rows, cols = matrix.shape
-    # gives the words for each document
-    words_per_doc = np.sum(matrix, axis=0)
-    # gives how many documents the word appears in
-    docs_per_word = np.sum(np.asarray(matrix > 0, 'i'), axis=1)
-
-    for i in range(rows):
-      for j in range(cols):
-        # calculate tfidf
-        tfidf_matrix[i][j] = (matrix[i][j] / words_per_doc[j]) * log(float(cols) / docs_per_word[i])
-
-    return tfidf_matrix
-
-
-class LSA:
-  def __init__(self, matrix, normalizer=None):
-    """
-    Initialise the LSA pipeline
-    :type matrix: matrices.FrequencyMatrix
-    :param normalizer: Any algorithm to normalize the frequency matrix
-    :type normalizer: Normalizer
-    """
-    self.freqmatrix = matrix
-    if normalizer:
-      self.matrix = normalizer.normalize(matrix.to_array())
-    else:
-      self.matrix = matrix.to_array()
-
-  def decompose(self):
-    """
-    Computes the Singular Value Decomposition matrix
-
-    :return: The SVD matrix
-    """
-    return scipy.linalg.svd(self.matrix)
-
-  def reduce_svd(self, k, svd=None):
-    """
-    Performs dimensionality reduction to the SVD matrix.
-
-    :param svd: The Singular Value Decomposition Matrix
-    :param k: Dimensions to keep
-    :type k: int
-
-    :return: The dimensionality reduced SVD
-    """
-
-    if svd:
-      u, s, vt = svd
-    else:
-      u, s, vt = self.decompose()
-
-    reduced = vt[0:k + 1, :]
-
-    return u, reduced
-
-  def cluster(self, no_clusters, rsvd, dim=2):
-    """
-    Clusters the documents using the SVD
-
-    :param no_clusters: Number of documents to cluster into
-    :param rsvd: The reduced SVD matrix
-    :param dim: The dimensions to use when clustering
-    :return: A tuple (centroids, doc_clusters, labels)
-    """
-    u, vt = rsvd
-
-    # prepare the data for kmeans clustering
-    data_kmeans = np.dstack((vt[i] for i in range(1, dim + 1)))[0]
-
-    # run kmeans+ on the data
-    centroids, doc_clusters = scipy.cluster.vq.kmeans2(data_kmeans, no_clusters, minit="points")
-
-    # doc_clusters is an array indicating to which cluster each document belongs
-    return centroids, doc_clusters, [label for label in self.freqmatrix.get_topics()]
 
 
 class Visualize:
@@ -142,6 +42,11 @@ class Visualize:
 
 
 class Pipeline:
+
+  """
+  Class which assembles all the parts together to build a document clustering
+  system.
+  """
 
   def __init__(self, docs):
     # set up some default filters

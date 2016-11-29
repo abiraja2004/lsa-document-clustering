@@ -68,17 +68,20 @@ class Source(object):
 
 class DocSource(Source):
 
-  """ Represents a document """
+  """ Represents a document source """
   def __init__(self, path, name):
     self.file = open(path, encoding='utf-8').read()
     super(DocSource, self).__init__(self.file, name)
 
 
 class FrequencyMatrix:
+
   def __init__(self, sources, filters=None):
     """
     Builds a frequency matrix for words and sources. Sources can be sentences or
     documents.
+
+    The matrix is |unique words| x |sources|
 
     :param sources: The text source where to build the frequency matrix
     :type  sources: list[Source]
