@@ -35,8 +35,7 @@ class Visualize:
     scalarMap = matplotlib.cm.ScalarMappable(cmap=colormap, norm=norm)
     self.plot(pts[1], pts[2], names, colours=[scalarMap.to_rgba(i) for i in doc_clusters])
 
-  @staticmethod
-  def show():
+  def show(self):
     plt.axis((-1, 1, 1, -1,))
     plt.show()
 
@@ -65,8 +64,7 @@ class Pipeline:
     centroids, doc_clusters, labels = lsa.cluster(clusters, rsvd, dim=dimensions_reduction)
     vis = Visualize()
     vis.plot_documents(rsvd, labels, doc_clusters, len(centroids))
-    Visualize.show()
-
+    vis.show()
 
 def load_documents(dir):
   global docs
