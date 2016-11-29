@@ -47,6 +47,8 @@ class Source(object):
 
   def frequency_count(self, filters=None, words=None):
     """
+    Computes a frequency-count dictionary of words vs number of times
+    they appear within this source
 
     :param filters: Collection of filters (conditions to remove words)
     :type  filters: list[WordFilter]
