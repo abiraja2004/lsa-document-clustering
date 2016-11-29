@@ -1,6 +1,8 @@
 import scipy
 import scipy.cluster
 import numpy as np
+import math
+
 
 class LSA:
   def __init__(self, matrix, normalizer=None):
@@ -43,6 +45,27 @@ class LSA:
     reduced = vt[0:k + 1, :]
 
     return u, reduced
+
+  def calculate_ranks(self, k, svd):
+
+    if svd:
+      u, s, vt = svd
+    else:
+      u, s, vt = self.decompose()
+
+    # compute the reduced sigma squared vector
+    sigma_reduced = (s ** 2 for i, s in enumerate(s[: k + 1]))
+
+    scores = []
+
+    for col_vector in vt.T:
+      # compute the column vector from svd times the squared
+      # singular values
+      s_k = sum(s * v ** 2 for s, v in zip(sigma_reduced, col_vector))
+      score = math.sqrt(s_k)
+      scores.append(score)
+
+    return scores
 
   def cluster(self, no_clusters, rsvd, dim=2):
     """

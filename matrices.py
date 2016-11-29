@@ -1,17 +1,22 @@
 import re
 import numpy as np
 from functools import reduce
+import languageprocessing
 
 
 class Source(object):
 
   """Represents a word source eg. a document or a sentence"""
 
-  def __init__(self, source, name):
+  def __init__(self, source, name, tokenizer=None):
     self.text = source
     self.name = name
     self.words = None
     self.no_words = 0
+    if tokenizer is None:
+      self.tokenizer = languageprocessing.RegexTokenizer
+    else:
+      self.tokenizer = tokenizer
 
   def get_words(self, filters=None):
     """
@@ -24,9 +29,7 @@ class Source(object):
     :return: List of words
     """
     # find all words in our source
-    word_list = re.compile('\w+').findall(self.text)
-    # convert them to lowercase
-    word_list = list(map(str.lower, word_list))
+    word_list = self.tokenizer.get_word_tokens(self.text)
 
     # filter our words so that only those who pass
     # the filter are accepted
@@ -69,9 +72,9 @@ class Source(object):
 class DocSource(Source):
 
   """ Represents a document source """
-  def __init__(self, path, name):
+  def __init__(self, path, name, tokenizer=None):
     self.file = open(path, encoding='utf-8').read()
-    super(DocSource, self).__init__(self.file, name)
+    super(DocSource, self).__init__(self.file, name, tokenizer)
 
 
 class FrequencyMatrix:

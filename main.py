@@ -66,12 +66,13 @@ class Pipeline:
     vis.plot_documents(rsvd, labels, doc_clusters, len(centroids))
     vis.show()
 
-def load_documents(dir):
-  global docs
+
+def load_documents(directory, tokenizer=None):
   docs = []
-  for filename in os.listdir(dir):
+  for filename in os.listdir(directory):
     if filename.endswith(".txt"):
-      docs.append(DocSource(os.path.join(dir, filename), filename))
+      docs.append(DocSource(os.path.join(directory, filename), filename, tokenizer=tokenizer))
+  return docs
 
 
 def input_or_default(default):
@@ -90,11 +91,10 @@ print("Enter directory to load examples from\n(Press enter for default: " + dir 
 
 dir = input_or_default(dir)
 
-load_documents(dir)
+docs=load_documents(dir, tokenizer=languageprocessing.NLTKTokenizer)
 print("Enter the number of clusters to detect: \n(Press enter for default: " + str(clusters) + ")")
 clusters = int(input_or_default(clusters))
 
-load_documents(dir)
 print("Enter SVD dimensions for clustering: \n(Press enter for default: " + str(svd_dim) + ")")
 svd_dim = int(input_or_default(svd_dim))
 
