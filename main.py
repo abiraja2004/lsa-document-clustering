@@ -1,43 +1,13 @@
 import os.path
 import filters
 from matrices import *
-from algorithms import *
+from algorithms import LSA
 from normalizers import *
-import matplotlib.cm
-import matplotlib.colors
-import matplotlib.pyplot as plt
+
 import nltk
 
-class Visualize:
-  def __init__(self):
-    self.colours = ['r', 'b', 'g']
-    self.cl = 0
 
-  def plot(self, xs, ys, labels, colours=None):
-    plt.scatter(xs, ys, c=colours)
-    if labels is not None:
-      for label, x, y in zip(labels, xs, ys):
-        plt.annotate(
-          label,
-          xy=(x, y), xytext=(-30, 30),
-          textcoords='offset points', ha='right', va='bottom',
-          arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))
-    self.cl += 1
 
-  def plot_cluster(self, centroids):
-    self.plot(centroids[:, 0], centroids[:, 1], labels=None, colours=['g'] * centroids.shape[1])
-
-  def plot_documents(self, svd, names, doc_clusters, no_clusters):
-    u, vt = svd
-    pts = vt
-    colormap = plt.get_cmap("hsv")
-    norm = matplotlib.colors.Normalize(vmin=0, vmax=no_clusters)
-    scalarMap = matplotlib.cm.ScalarMappable(cmap=colormap, norm=norm)
-    self.plot(pts[1], pts[2], names, colours=[scalarMap.to_rgba(i) for i in doc_clusters])
-
-  def show(self):
-    plt.axis((-1, 1, 1, -1,))
-    plt.show()
 
 
 class Pipeline:
@@ -53,21 +23,31 @@ class Pipeline:
     # calculate the frequency matrix
     self.term_matrix = FrequencyMatrix(docs, filters=self.filterz)
 
-  def run(self, dimensions_reduction, clusters, normalizer=TFIDF):
+  def cluster_documents(self, dimensions_reduction, clusters, normalizer=TFIDF):
     # Set-up Latent Semantic Analysis class
     lsa = LSA(self.term_matrix, normalizer=TFIDF)
     # Decompose term matrix into SVD
     svd = lsa.decompose()
     # Reduce the dimensions of the SVD
     rsvd = lsa.reduce_svd(dimensions_reduction, svd)
-    ll = lsa.calculate_ranks(dimensions_reduction, svd)
-    best = sorted(ll)
-    print(ll)
+    ll = lsa.significant_terms(dimensions_reduction, svd)
+    best = sorted(ll, reverse=True)
+    print(best[0],best[1],best[2])
     # Cluster the data
     centroids, doc_clusters, labels = lsa.cluster(clusters, rsvd, dim=dimensions_reduction)
     vis = Visualize()
     vis.plot_documents(rsvd, labels, doc_clusters, len(centroids))
     vis.show()
+
+  def summarize_sentences(self, dimensions_reduction, normalizer=TFIDF):
+    # Set-up Latent Semantic Analysis class
+    lsa = LSA(self.term_matrix, normalizer=TFIDF)
+    # Decompose matrix into SVD
+    svd = lsa.decompose()
+    # Calculate the most significant sentences based on SVD
+    # more details see algorithms.py
+
+    pass
 
 
 def create_sentence_sources(path, tokenizer=None):

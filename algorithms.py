@@ -28,9 +28,9 @@ class LSA:
 
   def reduce_svd(self, k, svd=None):
     """
-    Performs dimensionality reduction to the SVD matrix.
+    Performs dimensionality reduction to the SVD matrices.
 
-    :param svd: The Singular Value Decomposition Matrix
+    :param svd: The Singular Value Decomposition Matrices
     :param k: Dimensions to keep
     :type k: int
 
@@ -42,11 +42,32 @@ class LSA:
     else:
       u, s, vt = self.decompose()
 
-    reduced = vt[0:k + 1, :]
+    reduced_u = u[:, 0:k+1]
+    reduced_v = vt[0:k + 1, :]
 
-    return u, reduced
+    return reduced_u, reduced_v
 
   def significant_terms(self, k, svd):
+    """
+    Uses LSA to find the most the most significant topics in the SVD matrix. So for example
+    if we break down a document into sentences, then we can find the most significant
+    sentences by using this approach.
+
+
+    The significance (f) is calculated by:
+      f = sqrt(v_i^2 * sigma_i*2 for i=1..n)
+
+
+    Based on technique described in:
+
+    Using Latent Semantic Analysis in Text Summarization and Summary Evaluation
+    Josef Steinberger and Karel Ježek
+
+    :param k: Dimensions to reduce to
+    :type  k: int
+    :param svd: The SVD decomposition matrices
+    :return:
+    """
 
     if svd:
       u, s, vt = svd
@@ -57,14 +78,14 @@ class LSA:
     sigma_reduced = [s ** 2 for i, s in enumerate(s[: k + 1])]
 
     scores = []
-    topics = self.freqmatrix.get_topics()
+    topics = self.freqmatrix.get_sources()
 
     for i, col_vector in enumerate(vt.T):
       # compute the column vector from svd times the squared
       # singular values
       s_k = sum(s * v ** 2 for s, v in zip(sigma_reduced, col_vector))
       score = math.sqrt(s_k)
-      scores.append((score, topics[i]))
+      scores.append((score, topics[i].text))
 
     return scores
 
