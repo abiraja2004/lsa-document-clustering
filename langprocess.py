@@ -8,10 +8,9 @@ nltk.data.path= [os.path.dirname(os.path.abspath(__file__)) + os.sep + "nltk_dat
 
 
 class Tokenizer(object):
-
+  """Used to extract tokens (words) from documents"""
   @staticmethod
-  def get_word_tokens(text):
-    return None
+  def get_word_tokens(text): raise NotImplementedError
 
 
 class RegexTokenizer(Tokenizer):
@@ -31,8 +30,11 @@ class NLTKTokenizer(Tokenizer):
 
   lemmatizer = wordnet.WordNetLemmatizer()
 
+  """A more advanced tokenizer based on NLTK"""
   @staticmethod
   def get_word_tokens(text):
+    # break down words using NLTK
     tokens = nltk.word_tokenize(text)
+    # convert to lemmas to map similar words into the same one
     lemmatized = list(map(NLTKTokenizer.lemmatizer.lemmatize,tokens))
     return list(set(lemmatized))

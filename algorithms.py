@@ -3,6 +3,10 @@ import scipy.cluster
 import numpy as np
 import math
 
+##################################
+#       LSA implementation       #
+##################################
+
 
 class LSA:
   def __init__(self, matrix, normalizer=None):

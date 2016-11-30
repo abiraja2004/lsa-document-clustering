@@ -1,8 +1,13 @@
 import nltk
 import re
+import os
+
+# set the nltk data path to local dir
+nltk.data.path= [os.path.dirname(os.path.abspath(__file__)) + os.sep + "nltk_data"]
 
 
 class WordFilter(object):
+  """Determines which words should be rejected or not"""
   def accept(self, word): raise NotImplementedError
 
 
@@ -23,6 +28,7 @@ class StopWordFilter(WordFilter):
 
 class NLTKStopWordFilter(WordFilter):
 
+  """Uses stopwords from NLTK"""
   def __init__(self):
     self.stopwords = set(nltk.corpus.stopwords.words('english'))
 

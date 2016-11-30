@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 
 class Visualize:
 
+  """Contains utility functions for plotting"""
+
   def __init__(self):
     self.colours = ['r', 'b', 'g']
     self.cl = 0

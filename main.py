@@ -8,7 +8,7 @@ from visualize import Visualize
 import nltk
 
 
-class Pipeline:
+class Summarization:
   """
   Class which assembles all the parts together to build a document clustering
   system.
@@ -110,7 +110,7 @@ tokenizer = langprocess.NLTKTokenizer
 # normalizer of frequency matrix
 normalizer = TFIDF
 
-main = Pipeline()
+main = Summarization()
 
 print("------------------------------")
 print("Text summarization example\n")
