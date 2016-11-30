@@ -3,7 +3,7 @@ import re
 import os
 
 # set the nltk data path to local dir
-nltk.data.path= [os.path.dirname(os.path.abspath(__file__)) + os.sep + "nltk_data"]
+nltk.data.path.append(os.path.dirname(os.path.abspath(__file__)) + os.sep + "nltk_data")
 
 
 class WordFilter(object):
