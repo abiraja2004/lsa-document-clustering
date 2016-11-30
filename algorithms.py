@@ -46,7 +46,7 @@ class LSA:
 
     return u, reduced
 
-  def calculate_ranks(self, k, svd):
+  def significant_terms(self, k, svd):
 
     if svd:
       u, s, vt = svd
@@ -54,16 +54,17 @@ class LSA:
       u, s, vt = self.decompose()
 
     # compute the reduced sigma squared vector
-    sigma_reduced = (s ** 2 for i, s in enumerate(s[: k + 1]))
+    sigma_reduced = [s ** 2 for i, s in enumerate(s[: k + 1])]
 
     scores = []
+    topics = self.freqmatrix.get_topics()
 
-    for col_vector in vt.T:
+    for i, col_vector in enumerate(vt.T):
       # compute the column vector from svd times the squared
       # singular values
       s_k = sum(s * v ** 2 for s, v in zip(sigma_reduced, col_vector))
       score = math.sqrt(s_k)
-      scores.append(score)
+      scores.append((score, topics[i]))
 
     return scores
 

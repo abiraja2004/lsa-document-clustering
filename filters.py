@@ -1,3 +1,5 @@
+import nltk
+
 class WordFilter(object):
   def accept(self, word): raise NotImplementedError
 
@@ -12,6 +14,15 @@ class StopWordFilter(WordFilter):
       for line in f:
         words.append(line.lstrip().rstrip())
     self.stopwords = set(words)
+
+  def accept(self, word):
+    return word not in self.stopwords
+
+
+class NLTKStopWordFilter(WordFilter):
+
+  def __init__(self):
+    self.stopwords = set(nltk.corpus.stopwords.words('english'))
 
   def accept(self, word):
     return word not in self.stopwords

@@ -1,7 +1,6 @@
-import re
 import numpy as np
 from functools import reduce
-import languageprocessing
+import langprocess
 
 
 class Source(object):
@@ -14,7 +13,7 @@ class Source(object):
     self.words = None
     self.no_words = 0
     if tokenizer is None:
-      self.tokenizer = languageprocessing.RegexTokenizer
+      self.tokenizer = langprocess.RegexTokenizer
     else:
       self.tokenizer = tokenizer
 
@@ -77,6 +76,13 @@ class DocSource(Source):
     super(DocSource, self).__init__(self.file, name, tokenizer)
 
 
+class SentenceSource(Source):
+
+  """Represent a sentence source"""
+  def __init__(self, contents, name, tokenizer=None):
+    super(SentenceSource, self).__init__(contents, name, tokenizer)
+
+
 class FrequencyMatrix:
 
   def __init__(self, sources, filters=None):
@@ -124,6 +130,13 @@ class FrequencyMatrix:
     :return: The topics
     """
     return self.topics
+
+  def get_sources(self):
+    """
+    Return the sources in this frequency matrix
+    :return: The sources
+    """
+    return self.sources
 
   def to_array(self):
     """

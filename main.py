@@ -6,7 +6,7 @@ from normalizers import *
 import matplotlib.cm
 import matplotlib.colors
 import matplotlib.pyplot as plt
-
+import nltk
 
 class Visualize:
   def __init__(self):
@@ -49,17 +49,20 @@ class Pipeline:
 
   def __init__(self, docs):
     # set up some default filters
-    self.filterz = [filters.StopWordFilter("stopwords2.data"), filters.BasicWordFilter()]
+    self.filterz = [filters.StopWordFilter("stopwords2.data"), filters.NLTKStopWordFilter(), filters.BasicWordFilter()]
     # calculate the frequency matrix
     self.term_matrix = FrequencyMatrix(docs, filters=self.filterz)
 
-  def run(self, dimensions_reduction, clusters):
+  def run(self, dimensions_reduction, clusters, normalizer=TFIDF):
     # Set-up Latent Semantic Analysis class
     lsa = LSA(self.term_matrix, normalizer=TFIDF)
     # Decompose term matrix into SVD
     svd = lsa.decompose()
     # Reduce the dimensions of the SVD
     rsvd = lsa.reduce_svd(dimensions_reduction, svd)
+    ll = lsa.calculate_ranks(dimensions_reduction, svd)
+    best = sorted(ll)
+    print(ll)
     # Cluster the data
     centroids, doc_clusters, labels = lsa.cluster(clusters, rsvd, dim=dimensions_reduction)
     vis = Visualize()
@@ -67,7 +70,18 @@ class Pipeline:
     vis.show()
 
 
-def load_documents(directory, tokenizer=None):
+def create_sentence_sources(path, tokenizer=None):
+  document = open(path).read()
+  sources = []
+  sentences = nltk.tokenize.sent_tokenize(document)
+  i = 0
+  for s in sentences:
+    sources.append(SentenceSource(s, "Sentence " + str(i), tokenizer=tokenizer))
+    i += 1
+  return sources
+
+
+def create_document_sources(directory, tokenizer=None):
   docs = []
   for filename in os.listdir(directory):
     if filename.endswith(".txt"):
@@ -82,16 +96,31 @@ def input_or_default(default):
   else:
     return default
 
+######################
+# Parameters section #
+######################
 
 dir = "presidents_rivers"
 clusters = 3
 svd_dim = 2
 
+
+sentences = create_sentence_sources("presidents_rivers/bush.txt", tokenizer=langprocess.NLTKTokenizer)
+
+main = Pipeline(sentences)
+main.run(svd_dim, clusters)
+pass
+
+# tokenizer which breaks words down
+tokenizer = langprocess.NLTKTokenizer
+# normalizer of frequency matrix
+normalizer=TFIDF
+
 print("Enter directory to load examples from\n(Press enter for default: " + dir + ")")
 
 dir = input_or_default(dir)
 
-docs=load_documents(dir, tokenizer=languageprocessing.NLTKTokenizer)
+docs=create_document_sources(dir, tokenizer=langprocess.NLTKTokenizer)
 print("Enter the number of clusters to detect: \n(Press enter for default: " + str(clusters) + ")")
 clusters = int(input_or_default(clusters))
 
