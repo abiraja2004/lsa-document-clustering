@@ -17,6 +17,7 @@ class TFIDF(Normalizer):
   def normalize(matrix):
     """
     Normalizes the frequency counts as per the TF-IDF scheme (Salton and McGill, 1986)
+    (term frequency–inverse document frequency)
 
     :param matrix: The source/term frequency matrix
     :type  matrix: numpy.matrix

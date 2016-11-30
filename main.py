@@ -16,13 +16,22 @@ class Pipeline:
 
   def __init__(self):
     # set up some default filters
-    self.filterz = [filters.StopWordFilter("stopwords2.data"), filters.BasicWordFilter()]
+    self.filterz = [filters.StopWordFilter("stopwords2.data"), filters.NumberFilter(), filters.BasicWordFilter()]
 
   def cluster_documents(self, docs, dimensions_reduction, clusters, normalizer=TFIDF):
+    """
+    Clusters the documents based on text similarity using LSA
+
+    :param docs: List of documents
+    :param dimensions_reduction: Dimensions to reduce to
+    :param clusters: Number of clusters to cluster into
+    :param normalizer: Frequency normalizer class
+    :return: -
+    """
     # calculate the frequency matrix
     term_matrix = FrequencyMatrix(docs, filters=self.filterz)
     # Set-up Latent Semantic Analysis class
-    lsa = LSA(term_matrix, normalizer=TFIDF)
+    lsa = LSA(term_matrix, normalizer=normalizer)
     # Decompose term matrix into SVD
     svd = lsa.decompose()
     # Reduce the dimensions of the SVD
@@ -35,10 +44,19 @@ class Pipeline:
     vis.show()
 
   def summarize_sentences(self, sentences, dimensions_reduction, no_of_sentences=3, normalizer=TFIDF):
+    """
+    Brings out the most significant sentences out of a document, in turn producing a "summary"
+
+    :param sentences: List of sentences
+    :param dimensions_reduction: Dimensions to reduce to
+    :param no_of_sentences: Number of sentences to extract
+    :param normalizer: Frequency normalizer class
+    :return: -
+    """
     # calculate the frequency matrix
     term_matrix = FrequencyMatrix(sentences, filters=self.filterz)
     # Set-up Latent Semantic Analysis class
-    lsa = LSA(term_matrix, normalizer=TFIDF)
+    lsa = LSA(term_matrix, normalizer=normalizer)
     # Decompose matrix into SVD
     svd = lsa.decompose()
     # Calculate the most significant sentences based on SVD
@@ -82,9 +100,9 @@ def input_or_default(default):
 # Parameters section #
 ######################
 
-dir = "presidents_rivers"
+dir = "presidents_countries"
 sum_file = "obama.txt"
-clusters = 4
+clusters = 3
 svd_dim = 2
 
 # tokenizer which breaks words down
@@ -101,15 +119,20 @@ sum_file = input_or_default(sum_file)
 
 sentences = create_sentence_sources(os.path.join(dir, sum_file), tokenizer=langprocess.NLTKTokenizer)
 
-print("Summary of", sum_file)
+print("Summary of", sum_file,"(Please wait a few seconds)")
 main.summarize_sentences(sentences, 10)
 print("")
 
-print("------------------------------------")
+print("\n------------------------------------\n")
 print("Document clustering example\n")
+
 print("Enter directory to load examples from\n(Press enter for default: " + dir + ")")
 
 dir = input_or_default(dir)
+
+if dir == "presidents_countries":
+  print("The data comes from Wikipedia pages stripped out of citations and non-english characters.",
+        "We can see how the countries are sort of clustered on the top and presidents on the bottom.\n")
 
 docs = create_document_sources(dir, tokenizer=langprocess.NLTKTokenizer)
 print("Enter the number of clusters to detect: \n(Press enter for default: " + str(clusters) + ")")

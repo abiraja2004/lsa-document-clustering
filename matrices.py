@@ -37,6 +37,7 @@ class Source(object):
         for _filter in filters:
           if not _filter.accept(word):
             del word_list[i]
+            break
 
     self.words = word_list
     self.no_words = len(word_list)
@@ -115,7 +116,7 @@ class FrequencyMatrix:
     # in each of them
     for i, freq_count in enumerate(freq_counts):
       for word, count in freq_count.items():
-        matrix[word_columns[word]][i] = count;
+        matrix[word_columns[word]][i] = count
 
     self.topics = [s.get_name() for s in sources]
     self.matrix = matrix

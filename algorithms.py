@@ -104,7 +104,7 @@ class LSA:
     data_kmeans = np.dstack((vt[i] for i in range(1, dim + 1)))[0]
 
     # run kmeans+ on the data
-    centroids, doc_clusters = scipy.cluster.vq.kmeans2(data_kmeans, no_clusters, minit="points")
+    centroids, doc_clusters = scipy.cluster.vq.kmeans2(data_kmeans, no_clusters)
 
     # doc_clusters is an array indicating to which cluster each document belongs
     return centroids, doc_clusters, [label for label in self.freqmatrix.get_topics()]

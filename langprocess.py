@@ -24,7 +24,7 @@ class RegexTokenizer(Tokenizer):
     # convert them to lowercase
     word_list = list(map(str.lower, word_list))
 
-    return word_list
+    return list(set(word_list))
 
 
 class NLTKTokenizer(Tokenizer):
@@ -35,4 +35,4 @@ class NLTKTokenizer(Tokenizer):
   def get_word_tokens(text):
     tokens = nltk.word_tokenize(text)
     lemmatized = list(map(NLTKTokenizer.lemmatizer.lemmatize,tokens))
-    return lemmatized
+    return list(set(lemmatized))

@@ -1,4 +1,6 @@
 import nltk
+import re
+
 
 class WordFilter(object):
   def accept(self, word): raise NotImplementedError
@@ -28,9 +30,17 @@ class NLTKStopWordFilter(WordFilter):
     return word not in self.stopwords
 
 
+class NumberFilter(WordFilter):
+
+  """Removes numbers"""
+
+  def accept(self, word):
+    return not word.isdigit()
+
+
 class BasicWordFilter(WordFilter):
 
   """Basic simple filter"""
 
   def accept(self, word):
-    return len(word) > 1
+    return len(word) > 1 and re.match("\w", word)
