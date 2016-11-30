@@ -117,6 +117,7 @@ print("Text summarization example\n")
 print("Enter file to summarize\n (Press enter for default: " + sum_file + ")")
 sum_file = input_or_default(sum_file)
 
+# summarize the document by picking most important sentences
 sentences = create_sentence_sources(os.path.join(dir, sum_file), tokenizer=langprocess.NLTKTokenizer)
 
 print("Summary of", sum_file,"(Please wait a few seconds)")
